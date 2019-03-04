@@ -99,12 +99,15 @@ static handle_request(
     Send&& send)
 {
     // mormal response
-    auto const normal_response =
-    [&req](boost::beast::string_view target)
+    auto const http_response =
+    [&req](boost::beast::string_view target, boost::beast::string_view content_type = "text/html")
     {
+        if (content_type.empty()) {
+            content_type = "text/html";
+        }
         http::response<http::string_body> res{http::status::ok, req.version()};
         res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
-        res.set(http::field::content_type, "text/html");
+        res.set(http::field::content_type, content_type);
         res.keep_alive(req.keep_alive());
         res.body() = target.to_string();
         res.prepare_payload();
@@ -193,7 +196,7 @@ static handle_request(
     if (ret != RC_OK) {
         return send(server_error(req.target()));
     }
-    return send(normal_response(context->res_body_));
+    return send(http_response(context->res_body_, context->content_type_));
 
     // Attempt to open the file
     boost::beast::error_code ec;

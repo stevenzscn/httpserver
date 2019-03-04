@@ -14,6 +14,10 @@ public:
 
 public:
     std::string uri_;
+    std::string ua_;
+    std::string real_ip_;
+    std::string content_type_;
+
     std::string req_body_;
     std::string res_body_;
 };
